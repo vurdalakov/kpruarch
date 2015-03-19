@@ -32,7 +32,33 @@
                 return -1; // to avoid error CS0165
             }
 
+            for (var month = fromMonth; month <= 12; month++)
+            {
+                DownloadMonth(fromYear, month);
+            }
+
+            for (var year = fromYear + 1; year < toYear; year++)
+            {
+                for (var month = 1; month <= 12; month++)
+                {
+                    DownloadMonth(year, month);
+                }
+            }
+
+            if (fromYear != toYear)
+            {
+                for (var month = 1; month <= toMonth; month++)
+                {
+                    DownloadMonth(toYear, month);
+                }
+            }
+
             return 0;
+        }
+
+        private void DownloadMonth(Int32 year, Int32 month)
+        {
+            Console.WriteLine("{0}-{1}", year, month);
         }
 
         private Boolean ParseMonth(String yearMonth, out Int32 year, out Int32 month)
