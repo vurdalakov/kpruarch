@@ -197,7 +197,7 @@
         {
             Console.WriteLine("KpRuArch {0} | https://github.com/vurdalakov/kpruarch", ApplicationVersion);
             Console.WriteLine("Downloads 'Komsomolskaya Pravda' newspaper PDF archive.\n");
-            Console.WriteLine("Usage:\n\tkpruarch <id> <-d | -l> -from:1941-06 -to:1954-05 [-o:outdir] [-silent]");
+            Console.WriteLine("Usage:\n\tkpruarch <id> <-d | -l> -from:YYYY-MM -to:YYYY-MM [-o:outdir] [-silent]");
             Console.WriteLine("Options:");
             Console.WriteLine("\t-d      - download PDF files");
             Console.WriteLine("\t-l      - list PDF file URLs (no download)");
@@ -207,7 +207,7 @@
             Console.WriteLine("\t-silent - no error messsages are shown; check the exit code");
             Console.WriteLine("Examples:");
             Console.WriteLine("\tkpruarch 7ac813e090af08b5db74 -d -from:1941-06 -to:1945-05 -o:c:\\kp.ru");
-            Console.WriteLine("\tkpruarch 7ac813e090af08b5db74 -l -from:1941-06 -to:1954-05 > urls.txt");
+            Console.WriteLine("\tkpruarch 7ac813e090af08b5db74 -l -from:1941-06 -to:1945-05 > urls.txt");
             Console.WriteLine("\nYou get an <id> when you make a purchase at http://www.kp.ru/vday/");
             Environment.Exit(-1);
         }
