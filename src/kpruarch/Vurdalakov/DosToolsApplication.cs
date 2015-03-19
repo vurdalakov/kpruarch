@@ -1,6 +1,7 @@
 ﻿namespace Vurdalakov
 {
     using System;
+    using System.IO;
     using System.Reflection;
 
     public abstract class DosToolsApplication
@@ -13,6 +14,14 @@
             {
                 var parts = Assembly.GetExecutingAssembly().FullName.Split(',');
                 return parts[1].Split('=')[1];
+            }
+        }
+
+        public String ApplicationDirectory
+        {
+            get
+            {
+                return Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
             }
         }
 
