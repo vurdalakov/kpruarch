@@ -75,13 +75,19 @@
                 Console.WriteLine("No matches!");
             }
 
+            var directory = Path.Combine(_directory, String.Format("{0}_{1:D2}", matches[0].Groups[2].Value, matches[0].Groups[3].Value));
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             foreach (Match match in matches)
             {
                 if (5 == match.Groups.Count)
                 {
                     var fileUrl = match.Groups[1].Value;
                     var fileName = String.Format("kp_{0}_{1:D2}_{2:D2}.pdf", match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value);
-                    var filePath = Path.Combine(_directory, fileName);
+                    var filePath = Path.Combine(directory, fileName);
 
                     if (File.Exists(filePath))
                     {
