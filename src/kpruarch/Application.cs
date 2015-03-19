@@ -75,7 +75,7 @@
                 Console.WriteLine("No matches!");
             }
 
-            var directory = Path.Combine(_directory, String.Format("{0}_{1:D2}", matches[0].Groups[2].Value, matches[0].Groups[3].Value));
+            var directory = Path.Combine(_directory, String.Format("{0}-{1:D2}", matches[0].Groups[2].Value, matches[0].Groups[3].Value));
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
@@ -86,7 +86,7 @@
                 if (5 == match.Groups.Count)
                 {
                     var fileUrl = match.Groups[1].Value;
-                    var fileName = String.Format("kp_{0}_{1:D2}_{2:D2}.pdf", match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value);
+                    var fileName = String.Format("kp-{0}-{1:D2}-{2:D2}.pdf", match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value);
                     var filePath = Path.Combine(directory, fileName);
 
                     if (File.Exists(filePath))
