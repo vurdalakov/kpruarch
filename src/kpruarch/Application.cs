@@ -1,7 +1,9 @@
 ﻿namespace Vurdalakov
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Text.RegularExpressions;
 
@@ -47,24 +49,22 @@
             return 0;
         }
 
+        private List<String> _urls;
+
         private void ListUrls()
         {
-            _directory = _commandLineParser.GetOptionString("output", ApplicationDirectory);
-            if (!Directory.Exists(_directory))
-            {
-                Directory.CreateDirectory(_directory);
-            }
+            _urls = new List<String>();
 
             for (var month = _fromMonth; month <= 12; month++)
             {
-                DownloadMonth(_fromYear, month);
+                ListMonthUrls(_fromYear, month);
             }
 
             for (var year = _fromYear + 1; year < _toYear; year++)
             {
                 for (var month = 1; month <= 12; month++)
                 {
-                    DownloadMonth(year, month);
+                    ListMonthUrls(year, month);
                 }
             }
 
@@ -72,7 +72,26 @@
             {
                 for (var month = 1; month <= _toMonth; month++)
                 {
-                    DownloadMonth(_toYear, month);
+                    ListMonthUrls(_toYear, month);
+                }
+            }
+        }
+
+        private void ListMonthUrls(Int32 year, Int32 month)
+        {
+            var matches = GetUrlMatches(year, month);
+
+            foreach (Match match in matches)
+            {
+                if (5 == match.Groups.Count)
+                {
+                    var url = match.Groups[1].Value;
+
+                    if (!_urls.Contains(url, StringComparer.OrdinalIgnoreCase))
+                    {
+                        _urls.Add(url);
+                        Console.WriteLine(url);
+                    }
                 }
             }
         }
@@ -115,15 +134,7 @@
         {
             Print("{0}-{1:D2}", year, month);
 
-            var url = String.Format("http://www.kp.ru/arch/daily/great_war/{0}/{1:D2}/{2}/", year, month, _id);
-            
-            var html = _webClient.DownloadString(url);
-
-            var matches = Regex.Matches(html, @"""(http://pdf-download.kp.ru/api/pdf.bin/.*/(\d\d\d\d)/(\d\d)/(\d\d)/)""");
-            if (0 == matches.Count)
-            {
-                Console.WriteLine("No matches!");
-            }
+            var matches = GetUrlMatches(year, month);
 
             var directory = Path.Combine(_directory, String.Format("{0}-{1:D2}", matches[0].Groups[2].Value, matches[0].Groups[3].Value));
             if (!Directory.Exists(directory))
@@ -165,6 +176,21 @@
             month = Int32.Parse(match.Groups[2].Value);
 
             return true;
+        }
+
+        private MatchCollection GetUrlMatches(Int32 year, Int32 month)
+        {
+            var url = String.Format("http://www.kp.ru/arch/daily/great_war/{0}/{1:D2}/{2}/", year, month, _id);
+
+            var html = _webClient.DownloadString(url);
+
+            var matches = Regex.Matches(html, @"""(http://pdf-download.kp.ru/api/pdf.bin/.*/(\d\d\d\d)/(\d\d)/(\d\d)/)""");
+            if (0 == matches.Count)
+            {
+                throw new Exception("No matches!");
+            }
+
+            return matches;
         }
 
         protected override void Help()
