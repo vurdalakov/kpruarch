@@ -7,6 +7,13 @@
 
     public class Application : DosToolsApplication
     {
+        private String _id;
+
+        private Int32 _fromYear;
+        private Int32 _fromMonth;
+        private Int32 _toYear;
+        private Int32 _toMonth;
+
         protected override Int32 Execute()
         {
             if (_commandLineParser.FileNames.Length != 1)
@@ -16,28 +23,44 @@
 
             _id = _commandLineParser.FileNames[0];
 
+            var from = _commandLineParser.GetOptionString("from", "1941-06");
+            var to = _commandLineParser.GetOptionString("to", "1945-05");
+
+            if (!ParseMonth(from, out _fromYear, out _fromMonth) || !ParseMonth(to, out _toYear, out _toMonth))
+            {
+                Help();
+            }
+
+            if (_commandLineParser.IsOptionSet("l", "list"))
+            {
+                ListUrls();
+            }
+            else if (_commandLineParser.IsOptionSet("d", "download"))
+            {
+                Download();
+            }
+            else
+            {
+                Help();
+            }
+
+            return 0;
+        }
+
+        private void ListUrls()
+        {
             _directory = _commandLineParser.GetOptionString("output", ApplicationDirectory);
             if (!Directory.Exists(_directory))
             {
                 Directory.CreateDirectory(_directory);
             }
 
-            var from = _commandLineParser.GetOptionString("from", "1941-06");
-            var to = _commandLineParser.GetOptionString("to", "1945-05");
-
-            Int32 fromYear, fromMonth, toYear, toMonth;
-            if (!ParseMonth(from, out fromYear, out fromMonth) || !ParseMonth(to, out toYear, out toMonth))
+            for (var month = _fromMonth; month <= 12; month++)
             {
-                Help();
-                return -1; // to avoid error CS0165
+                DownloadMonth(_fromYear, month);
             }
 
-            for (var month = fromMonth; month <= 12; month++)
-            {
-                DownloadMonth(fromYear, month);
-            }
-
-            for (var year = fromYear + 1; year < toYear; year++)
+            for (var year = _fromYear + 1; year < _toYear; year++)
             {
                 for (var month = 1; month <= 12; month++)
                 {
@@ -45,21 +68,48 @@
                 }
             }
 
-            if (fromYear != toYear)
+            if (_fromYear != _toYear)
             {
-                for (var month = 1; month <= toMonth; month++)
+                for (var month = 1; month <= _toMonth; month++)
                 {
-                    DownloadMonth(toYear, month);
+                    DownloadMonth(_toYear, month);
                 }
             }
-
-            return 0;
         }
 
-        private String _id;
         private String _directory;
 
         private WebClient _webClient = new WebClient();
+
+        private void Download()
+        {
+            _directory = _commandLineParser.GetOptionString("output", ApplicationDirectory);
+            if (!Directory.Exists(_directory))
+            {
+                Directory.CreateDirectory(_directory);
+            }
+
+            for (var month = _fromMonth; month <= 12; month++)
+            {
+                DownloadMonth(_fromYear, month);
+            }
+
+            for (var year = _fromYear + 1; year < _toYear; year++)
+            {
+                for (var month = 1; month <= 12; month++)
+                {
+                    DownloadMonth(year, month);
+                }
+            }
+
+            if (_fromYear != _toYear)
+            {
+                for (var month = 1; month <= _toMonth; month++)
+                {
+                    DownloadMonth(_toYear, month);
+                }
+            }
+        }
 
         private void DownloadMonth(Int32 year, Int32 month)
         {
